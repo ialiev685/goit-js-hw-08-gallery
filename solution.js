@@ -1,4 +1,6 @@
 import galleryItems from "./gallery-items.js";
+const lenGallery = galleryItems.length - 1; // длинна массива картинок
+let currentIndex = 0; // текущая позиция картинки
 
 const listItemsEl = document.querySelector(".js-gallery");
 
@@ -39,28 +41,75 @@ function onModalOpen(event) {
   event.preventDefault(); //  отмена перезагрузки страница или переход по ссылке
   if (event.target.nodeName !== "IMG") return;
 
-  modalEl.classList.add("is-open");
+  window.addEventListener("keydown", onEscapePress);
 
   const atrUrlCont = event.target.dataset.source;
   const atrAltCont = event.target.alt;
 
-  addDatatoContentModal(atrUrlCont, atrAltCont);
+  showAndAddDataToModal(atrUrlCont, atrAltCont);
 }
 
 function onModalClose(event) {
-  if (event.target.nodeName !== "BUTTON") return;
-  if (event.target.dataset.action === "close-lightbox") {
-    modalEl.classList.remove("is-open");
+  const action = event.target;
+  if (
+    action.dataset.action === "close-lightbox" ||
+    action.className === "lightbox__overlay"
+  ) {
+    hideAndRemoveDataToModal();
   }
-  removeDatatoContentModal();
 }
 
-function addDatatoContentModal(atrSrc, atrAlt) {
+function showAndAddDataToModal(atrSrc, atrAlt) {
+  modalEl.classList.add("is-open");
+
   contentModalEl.src = atrSrc;
   contentModalEl.alt = atrAlt;
 }
 
-function removeDatatoContentModal() {
+function hideAndRemoveDataToModal() {
+  window.removeEventListener("keydown", onEscapePress);
+  modalEl.classList.remove("is-open");
+
   contentModalEl.src = "";
   contentModalEl.alt = "";
+}
+
+function onEscapePress(event) {
+  console.log(event.code);
+  const ESC_KEY_CODE = "Escape";
+  const LEFT_KEY_CODE = "ArrowLeft";
+  const RIGHT_KEY_CODE = "ArrowRight";
+
+  const isKeyEsc = event.code === ESC_KEY_CODE;
+  const isKeyLeft = event.code === LEFT_KEY_CODE;
+  const isKeyRight = event.code === RIGHT_KEY_CODE;
+
+  if (isKeyEsc) hideAndRemoveDataToModal();
+  if (isKeyLeft) prevItem();
+  if (isKeyRight) nextItem();
+}
+function prevItem() {
+  const findItem = galleryItems.find(({ original }, index) => {
+    currentIndex = index;
+    return original === contentModalEl.src;
+  });
+
+  if (currentIndex > 0) {
+    currentIndex -= 1;
+  }
+
+  contentModalEl.src = galleryItems[currentIndex].original;
+}
+
+function nextItem() {
+  const findItem = galleryItems.find(({ original }, index) => {
+    currentIndex = index;
+    return original === contentModalEl.src;
+  });
+
+  if (currentIndex < lenGallery) {
+    currentIndex += 1;
+  }
+
+  contentModalEl.src = galleryItems[currentIndex].original;
 }
