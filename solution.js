@@ -43,10 +43,10 @@ function onModalOpen(event) {
 
   window.addEventListener("keydown", onEscapePress);
 
-  const atrUrlCont = event.target.dataset.source;
+  const atrSrcCont = event.target.dataset.source;
   const atrAltCont = event.target.alt;
 
-  showAndAddDataToModal(atrUrlCont, atrAltCont);
+  showAndAddDataToModal(atrSrcCont, atrAltCont);
 }
 
 function onModalClose(event) {
@@ -89,27 +89,29 @@ function onEscapePress(event) {
   if (isKeyRight) nextItem();
 }
 function prevItem() {
-  const findItem = galleryItems.find(({ original }, index) => {
-    currentIndex = index;
-    return original === contentModalEl.src;
-  });
-
+  findCurrentIndexItem();
   if (currentIndex > 0) {
     currentIndex -= 1;
   }
 
   contentModalEl.src = galleryItems[currentIndex].original;
+  contentModalEl.alt = galleryItems[currentIndex].description;
 }
 
 function nextItem() {
-  const findItem = galleryItems.find(({ original }, index) => {
-    currentIndex = index;
-    return original === contentModalEl.src;
-  });
+  findCurrentIndexItem();
 
   if (currentIndex < lenGallery) {
     currentIndex += 1;
   }
 
   contentModalEl.src = galleryItems[currentIndex].original;
+  contentModalEl.alt = galleryItems[currentIndex].description;
+}
+
+function findCurrentIndexItem() {
+  galleryItems.find(({ original }, index) => {
+    currentIndex = index;
+    return original === contentModalEl.src;
+  });
 }
